@@ -12,6 +12,7 @@ import ARKit
 class ViewController: UIViewController, ARSCNViewDelegate {
     
     var dotNodes = [SCNNode]()
+    var textNode = SCNNode()
 
     @IBOutlet var sceneView: ARSCNView!
     
@@ -45,6 +46,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         print("Touched")
+        if dotNodes.count >= 2 {
+            for dot in dotNodes {
+                dot.removeFromParentNode()
+            }
+            dotNodes.removeAll()
+            textNode.removeFromParentNode()
+        }
+        
         guard let touchLocation = touches.first?.location(in: sceneView) else {return}
         let hitTestResults = sceneView.hitTest(touchLocation, types: .featurePoint)
         
@@ -88,7 +97,27 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let c = end.position.z - start.position.z
         
         let result = abs(sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2)))
-        print(result)
+        updateText("\(result.roundTo3()) m", at: end.position)
+    }
+    
+    private func updateText(_ text: String, at position: SCNVector3) {
+        let textGeometry = SCNText(string: text, extrusionDepth: 1.0)
+        textGeometry.firstMaterial?.diffuse.contents = UIColor.red
+        
+        textNode = SCNNode(geometry: textGeometry)
+        textNode.position = position
+        textNode.scale = SCNVector3(0.01, 0.01, 0.01)
+        
+        sceneView.scene.rootNode.addChildNode(textNode)
+        print(text)
     }
 
+}
+
+
+extension Float {
+    func roundTo3() -> Float {
+        return  Float(Int(self * 1000)) / 1000
+        
+    }
 }
