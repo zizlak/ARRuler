@@ -10,6 +10,8 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
+    
+    var dotNodes = [SCNNode]()
 
     @IBOutlet var sceneView: ARSCNView!
     
@@ -69,6 +71,24 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         sceneView.scene.rootNode.addChildNode(node)
         
+        dotNodes.append(node)
+        
+        if dotNodes.count >= 2 {
+            calculate()
+        }
+        
+    }
+    
+    private func calculate() {
+        let start = dotNodes[0]
+        let end = dotNodes[1]
+        
+        let a = end.position.x - start.position.x
+        let b = end.position.y - start.position.y
+        let c = end.position.z - start.position.z
+        
+        let result = abs(sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2)))
+        print(result)
     }
 
 }
